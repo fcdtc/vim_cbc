@@ -26,22 +26,6 @@ Plug 'fcdtc/vim_cbc'
 :PlugInstall
 ```
 
-### 使用 packer.nvim
-
-```lua
-use '/Users/congfei/github/vim_cbc'
-```
-
-### 使用 lazy.nvim
-
-```lua
-{
-  dir = '/Users/congfei/github/vim_cbc',
-  config = function()
-    require('vim_cbc').setup()
-  end
-}
-```
 
 ## 配置
 

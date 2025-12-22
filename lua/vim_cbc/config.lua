@@ -3,7 +3,7 @@ local M = {}
 
 -- 默认配置
 M.defaults = {
-  width = 0.5,                -- 窗口宽度（0-1为百分比，>1为绝对列数）
+  width = 0.2,                -- 窗口宽度（0-1为百分比，>1为绝对列数）
   position = 'right',         -- 位置：'right' 或 'left'
   command = 'codebuddy-code', -- 执行的命令
   auto_insert = true,         -- 打开时是否自动进入插入模式

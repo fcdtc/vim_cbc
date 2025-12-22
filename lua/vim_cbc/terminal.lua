@@ -86,6 +86,8 @@ function M.open()
   vim.api.nvim_win_set_option(win, 'number', false)
   vim.api.nvim_win_set_option(win, 'relativenumber', false)
   vim.api.nvim_win_set_option(win, 'signcolumn', 'no')
+  vim.api.nvim_win_set_option(win, 'cursorline', false)  -- 禁用光标行高亮（去掉下划线）
+  vim.api.nvim_win_set_option(win, 'cursorcolumn', false) -- 禁用光标列高亮
 
   -- 如果配置了自动进入插入模式
   if config.get('auto_insert') then

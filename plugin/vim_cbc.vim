@@ -11,11 +11,8 @@ command! CodebuddyOpen lua require('vim_cbc').open()
 command! CodebuddyClose lua require('vim_cbc').close()
 
 " 设置快捷键映射
-" <leader>cc: 切换 Codebuddy 终端（保持会话）
-nnoremap <silent> <leader>cc :lua require('vim_cbc').toggle()<CR>
-
-" <leader>cb: 完全关闭 Codebuddy 终端
-nnoremap <silent> <leader>cb :lua require('vim_cbc').close()<CR>
+" <leader>..: 切换 Codebuddy 终端（保持会话）
+nnoremap <silent> <leader>.. :lua require('vim_cbc').toggle()<CR>
 
 " <C-h>: 从终端模式返回编辑器窗口
 " <C-\><C-n> 用于退出终端插入模式

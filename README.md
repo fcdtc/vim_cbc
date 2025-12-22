@@ -18,7 +18,7 @@
 在您的 `~/.config/nvim/init.vim` 中添加：
 
 ```vim
-Plug '/Users/congfei/github/vim_cbc'
+Plug 'fcdtc/vim_cbc'
 ```
 
 然后执行：

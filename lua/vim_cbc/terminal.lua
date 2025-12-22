@@ -95,8 +95,8 @@ function M.open()
   end
 end
 
--- 关闭终端窗口（但保留 buffer）
-function M.close()
+-- 隐藏终端窗口（但保留 buffer 和进程，用于 toggle）
+local function hide()
   if M.is_visible() then
     -- 如果当前在终端窗口中，先跳回上一个窗口
     if vim.api.nvim_get_current_win() == state.terminal_win then
@@ -111,10 +111,41 @@ function M.close()
   end
 end
 
--- 切换终端显示/隐藏
+-- 完全关闭终端（终止进程并清理所有资源）
+function M.close()
+  -- 终止终端进程
+  if state.job_id then
+    vim.fn.jobstop(state.job_id)
+    state.job_id = nil
+  end
+
+  -- 关闭窗口
+  if M.is_visible() then
+    -- 如果当前在终端窗口中，先跳回上一个窗口
+    if vim.api.nvim_get_current_win() == state.terminal_win then
+      if state.previous_win and vim.api.nvim_win_is_valid(state.previous_win) then
+        vim.api.nvim_set_current_win(state.previous_win)
+      end
+    end
+
+    window.close(state.terminal_win)
+    state.terminal_win = nil
+  end
+
+  -- 删除 buffer
+  if buffer_exists() then
+    vim.api.nvim_buf_delete(state.terminal_buf, { force = true })
+    state.terminal_buf = nil
+  end
+
+  -- 清理状态
+  state.previous_win = nil
+end
+
+-- 切换终端显示/隐藏（保持会话）
 function M.toggle()
   if M.is_visible() then
-    M.close()
+    hide()  -- 使用 hide 而不是 close，保持会话
   else
     M.open()
   end

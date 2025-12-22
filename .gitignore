@@ -1,0 +1,11 @@
+# Vim/Neovim
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Claude Code
+.claude/
+
+# Helptags
+doc/tags

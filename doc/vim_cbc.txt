@@ -1,0 +1,175 @@
+*vim_cbc.txt*  Neovim plugin for Codebuddy Code terminal integration
+
+==============================================================================
+CONTENTS                                                    *vim_cbc-contents*
+
+    1. 简介 ........................... |vim_cbc-intro|
+    2. 安装 ........................... |vim_cbc-installation|
+    3. 配置 ........................... |vim_cbc-configuration|
+    4. 快捷键 ......................... |vim_cbc-mappings|
+    5. 命令 ........................... |vim_cbc-commands|
+    6. API ............................. |vim_cbc-api|
+    7. 许可证 ......................... |vim_cbc-license|
+
+==============================================================================
+1. 简介                                                        *vim_cbc-intro*
+
+vim_cbc 是一个 Neovim 插件，用于在侧边分屏中打开 Codebuddy Code 终端。
+
+主要特性：
+- 在右侧或左侧分屏打开 Codebuddy Code 终端
+- 持久化终端会话（隐藏后保持会话状态）
+- 快捷键快速切换窗口焦点
+- 灵活的配置选项
+
+==============================================================================
+2. 安装                                                *vim_cbc-installation*
+
+使用 vim-plug: >
+    Plug '/Users/congfei/github/vim_cbc'
+<
+
+使用 packer.nvim: >
+    use '/Users/congfei/github/vim_cbc'
+<
+
+使用 lazy.nvim: >
+    {
+      dir = '/Users/congfei/github/vim_cbc',
+      config = function()
+        require('vim_cbc').setup()
+      end
+    }
+<
+
+==============================================================================
+3. 配置                                              *vim_cbc-configuration*
+
+在你的 init.lua 中配置: >
+    require('vim_cbc').setup({
+      width = 0.5,                -- 窗口宽度
+      position = 'right',         -- 位置：'right' 或 'left'
+      command = 'codebuddy-code', -- 执行的命令
+      auto_insert = true,         -- 打开时自动进入插入模式
+      close_on_exit = false       -- 命令退出时是否关闭终端
+    })
+<
+
+在 init.vim 中配置: >
+    lua << EOF
+    require('vim_cbc').setup({
+      width = 0.5,
+      position = 'right',
+    })
+    EOF
+<
+
+配置项说明:
+
+*vim_cbc.width*
+    类型: number
+    默认值: 0.5
+    窗口宽度。值在 0-1 之间表示占屏幕的百分比，大于 1 表示固定列数。
+
+*vim_cbc.position*
+    类型: string
+    默认值: 'right'
+    终端窗口位置。可选值：'right'（右侧）或 'left'（左侧）。
+
+*vim_cbc.command*
+    类型: string
+    默认值: 'codebuddy-code'
+    在终端中执行的命令。
+
+*vim_cbc.auto_insert*
+    类型: boolean
+    默认值: true
+    打开终端时是否自动进入插入模式。
+
+*vim_cbc.close_on_exit*
+    类型: boolean
+    默认值: false
+    命令退出时是否关闭终端窗口。
+
+==============================================================================
+4. 快捷键                                                  *vim_cbc-mappings*
+
+默认快捷键:
+
+<leader>cb                                                      *<leader>cb*
+    普通模式下切换 Codebuddy 终端的显示/隐藏。
+
+<C-h>                                                                *<C-h>*
+    终端模式下，返回到编辑器窗口。
+
+<Esc><Esc>                                                      *<Esc><Esc>*
+    终端模式下，退出插入模式到普通模式。
+
+自定义快捷键示例: >
+    " 使用 F12 替代 <leader>cb
+    nnoremap <silent> <F12> :lua require('vim_cbc').toggle()<CR>
+
+    " 使用 <C-j> 替代 <C-h>
+    tnoremap <silent> <C-j> <C-\><C-n>:lua require('vim_cbc').focus_editor()<CR>
+<
+
+==============================================================================
+5. 命令                                                    *vim_cbc-commands*
+
+:CodebuddyToggle                                            *:CodebuddyToggle*
+    切换 Codebuddy 终端的显示/隐藏。
+
+:CodebuddyOpen                                                *:CodebuddyOpen*
+    打开 Codebuddy 终端。
+
+:CodebuddyClose                                              *:CodebuddyClose*
+    关闭 Codebuddy 终端（保留会话）。
+
+==============================================================================
+6. API                                                            *vim_cbc-api*
+
+vim_cbc 模块提供以下 Lua API:
+
+require('vim_cbc').setup({opts})                            *vim_cbc.setup()*
+    初始化插件配置。
+
+    参数: ~
+        {opts} (table) 配置选项表
+
+require('vim_cbc').toggle()                                *vim_cbc.toggle()*
+    切换终端显示/隐藏。
+
+require('vim_cbc').open()                                    *vim_cbc.open()*
+    打开终端。
+
+require('vim_cbc').close()                                  *vim_cbc.close()*
+    关闭终端（保留会话）。
+
+require('vim_cbc').focus_editor()                    *vim_cbc.focus_editor()*
+    将焦点返回到编辑器窗口。
+
+使用示例: >
+    local cbc = require('vim_cbc')
+
+    -- 初始化
+    cbc.setup({
+      width = 80,
+      position = 'left'
+    })
+
+    -- 打开终端
+    cbc.open()
+
+    -- 切换终端
+    cbc.toggle()
+<
+
+==============================================================================
+7. 许可证                                                    *vim_cbc-license*
+
+MIT License
+
+Copyright (c) 2025 congfei
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:

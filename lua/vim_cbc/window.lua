@@ -1,56 +1,95 @@
--- window.lua - 窗口管理模块
+-- window.lua - 窗口管理模块（支持全屏模式）
 local config = require('vim_cbc.config')
 local M = {}
 
--- 计算窗口宽度
-local function calculate_width(config_width)
-  if config_width > 0 and config_width < 1 then
-    -- 百分比模式：0-1 之间表示占屏幕的百分比
-    return math.floor(vim.o.columns * config_width)
-  else
-    -- 绝对值模式：>1 表示固定列数
-    return math.floor(config_width)
-  end
-end
-
--- 创建垂直分屏窗口
--- @param width number: 窗口宽度（配置值）
--- @param position string: 位置 ('right' 或 'left')
+-- 创建全屏窗口（新标签页方案）
 -- @param buf number: buffer ID
--- @return number: 窗口 ID
-function M.create_split(width, position, buf)
-  -- 保存当前窗口，以便后续返回
-  local previous_win = vim.api.nvim_get_current_win()
+-- @return table: {win_id, previous_tabpage, previous_layout}
+function M.create_fullscreen(buf)
+  -- 保存当前状态
+  local previous_tabpage = vim.api.nvim_get_current_tabpage()
+  local previous_layout = {
+    tabpage = previous_tabpage,
+    windows = vim.api.nvim_tabpage_list_wins(previous_tabpage)
+  }
 
-  -- 计算实际宽度
-  local actual_width = calculate_width(width)
+  -- 创建新标签页
+  vim.cmd('tabnew')
+  local new_tabpage = vim.api.nvim_get_current_tabpage()
 
-  -- 根据位置创建分屏
-  if position == 'left' then
-    vim.cmd('topleft vsplit')
-  else
-    vim.cmd('botright vsplit')
-  end
-
-  -- 设置窗口宽度
-  vim.cmd('vertical resize ' .. actual_width)
-
-  -- 获取新窗口 ID
+  -- 获取当前窗口并最大化
   local win = vim.api.nvim_get_current_win()
 
-  -- 将 buffer 设置到新窗口
+  -- 设置 buffer
   if buf then
     vim.api.nvim_win_set_buf(win, buf)
   end
 
-  return win, previous_win
+  return {
+    win_id = win,
+    previous_tabpage = previous_tabpage,
+    previous_layout = previous_layout
+  }
 end
 
--- 关闭指定窗口
--- @param win_id number: 窗口 ID
-function M.close(win_id)
-  if win_id and vim.api.nvim_win_is_valid(win_id) then
-    vim.api.nvim_win_close(win_id, false)
+-- 创建分割窗口（向后兼容）
+-- @param buf number: buffer ID
+-- @return table: {win_id, previous_win}
+function M.create_split(buf)
+  -- 保存当前窗口
+  local previous_win = vim.api.nvim_get_current_win()
+
+  -- 创建右侧分屏（保持原有行为）
+  vim.cmd('botright vsplit')
+
+  -- 设置窗口宽度为屏幕的20%（保持原有默认值）
+  local width = math.floor(vim.o.columns * 0.2)
+  vim.cmd('vertical resize ' .. width)
+
+  -- 获取新窗口
+  local win = vim.api.nvim_get_current_win()
+
+  -- 设置 buffer
+  if buf then
+    vim.api.nvim_win_set_buf(win, buf)
+  end
+
+  return {
+    win_id = win,
+    previous_win = previous_win
+  }
+end
+
+-- 创建窗口（根据配置模式自动选择）
+-- @param buf number: buffer ID
+-- @return table: 窗口创建结果
+function M.create(buf)
+  if config.is_fullscreen() then
+    return M.create_fullscreen(buf)
+  else
+    return M.create_split(buf)
+  end
+end
+
+-- 关闭窗口（支持全屏和分割模式）
+-- @param result table: 窗口创建结果
+function M.close(result)
+  if not result then return end
+
+  if result.previous_tabpage then
+    -- 全屏模式：关闭当前标签页，返回原标签页
+    vim.cmd('tabclose')
+    if vim.api.nvim_tabpage_is_valid(result.previous_tabpage) then
+      vim.api.nvim_set_current_tabpage(result.previous_tabpage)
+    end
+  else
+    -- 分割模式：关闭当前窗口，返回原窗口
+    if result.win_id and vim.api.nvim_win_is_valid(result.win_id) then
+      vim.api.nvim_win_close(result.win_id, false)
+    end
+    if result.previous_win and vim.api.nvim_win_is_valid(result.previous_win) then
+      vim.api.nvim_set_current_win(result.previous_win)
+    end
   end
 end
 
@@ -62,6 +101,11 @@ function M.focus(win_id)
     return true
   end
   return false
+end
+
+-- 检查窗口是否有效
+function M.is_valid(win_id)
+  return win_id and vim.api.nvim_win_is_valid(win_id)
 end
 
 return M

@@ -52,6 +52,9 @@ function M.open()
   state.window_result = window.create(state.terminal_buf)
   state.terminal_win = state.window_result.win_id
 
+  -- 确保窗口结果中包含 buffer 信息，用于后续清理
+  state.window_result.buf = state.terminal_buf
+
   -- 如果是新创建的 buffer（没有 job_id），启动终端
   if not state.job_id then
     local cmd = config.get('command')

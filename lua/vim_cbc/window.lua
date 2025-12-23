@@ -17,10 +17,10 @@ function M.create_fullscreen(buf)
   vim.cmd('tabnew')
   local new_tabpage = vim.api.nvim_get_current_tabpage()
 
-  -- 获取当前窗口并最大化
+  -- 获取当前窗口
   local win = vim.api.nvim_get_current_win()
 
-  -- 设置 buffer
+  -- 立即设置 buffer，替换掉 tabnew 创建的默认 buffer
   if buf then
     vim.api.nvim_win_set_buf(win, buf)
   end
@@ -28,7 +28,8 @@ function M.create_fullscreen(buf)
   return {
     win_id = win,
     previous_tabpage = previous_tabpage,
-    previous_layout = previous_layout
+    previous_layout = previous_layout,
+    new_buf = nil  -- 不再创建新 buffer，直接使用传入的 buf
   }
 end
 

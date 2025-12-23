@@ -18,5 +18,3 @@ nnoremap <silent> <leader>.. :lua require('vim_cbc').toggle()<CR>
 " <C-\><C-n> 用于退出终端插入模式
 tnoremap <silent> <C-h> <C-\><C-n>:lua require('vim_cbc').focus_editor()<CR>
 
-" <Esc><Esc>: 退出终端插入模式到普通模式
-tnoremap <silent> <Esc><Esc> <C-\><C-n>
